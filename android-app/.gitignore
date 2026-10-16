@@ -2,3 +2,16 @@
 build/
 app/build/
 local.properties
+
+# Android Studio local state
+.idea/
+
+# Generated release artifacts
+app/release/
+*.apk
+
+# Signing material and exported certificate
+*.jks
+*.keystore
+keystore.properties
+/release-cert.der
