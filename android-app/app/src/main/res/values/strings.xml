@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">BedrockConnect LAN</string>
     <string name="app_kicker">CONSOLE BRIDGE</string>
-    <string name="app_subtitle">La scorciatoia per i server Bedrock</string>
+    <string name="app_subtitle">Un sistema complicatissimo per fare cose semplicissime</string>
     <string name="status_idle">Server fermo</string>
     <string name="status_starting">Avvio in corso</string>
     <string name="status_active">Server attivo</string>
@@ -23,7 +23,7 @@
     <string name="destination_address">85.14.210.14:21200</string>
     <string name="start_server">Avvia server</string>
     <string name="stop_server">Ferma</string>
-    <string name="playstation_steps"><b>Su PlayStation:</b> apri Minecraft, vai in Gioca → Mondi e seleziona BedrockConnect.</string>
+    <string name="playstation_steps"><b>Sulla PS5 mo:</b> fai parti Minecraft, poi metti Gioca → Mondi e dovrebbe starci BedrockConnect.</string>
     <string name="live_log">LOG IN TEMPO REALE</string>
     <string name="log_hint">Si aggiorna solo quando arrivano nuovi eventi</string>
     <string name="no_logs">I log appariranno qui dopo l’avvio.</string>

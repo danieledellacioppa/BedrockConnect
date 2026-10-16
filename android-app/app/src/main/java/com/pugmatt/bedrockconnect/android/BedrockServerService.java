@@ -63,6 +63,7 @@ public final class BedrockServerService extends Service {
             File logs = new File(data, "logs");
             if (!logs.exists()) logs.mkdirs();
             File customServers = new File(data, "custom_servers.json");
+            File customLanguage = new File(data, "language_android.json");
 
             JSONObject server = new JSONObject();
             server.put("name", "DIOCALANDIA");
@@ -74,18 +75,28 @@ public final class BedrockServerService extends Service {
                 output.write(list.toString().getBytes(StandardCharsets.UTF_8));
             }
 
+            JSONObject serverInfo = new JSONObject();
+            serverInfo.put("motd", "SonyMERDA");
+            serverInfo.put("subMotd", "Sony è la MERDA? Si!");
+            JSONObject language = new JSONObject();
+            language.put("serverInfo", serverInfo);
+            try (FileOutputStream output = new FileOutputStream(customLanguage, false)) {
+                output.write(language.toString().getBytes(StandardCharsets.UTF_8));
+            }
+
             System.setProperty("logFile", "true");
             System.setProperty("logDirectory", logs.getAbsolutePath());
             System.setProperty("log4j2.disableJmx", "true");
             BedrockConnect.setWorkingDirectory(data);
             BedrockConnect.main(new String[]{
                     "debug=true",
-                    "custom_servers=" + customServers.getAbsolutePath()
+                    "custom_servers=" + customServers.getAbsolutePath(),
+                    "language=" + customLanguage.getAbsolutePath()
             });
             if (BedrockConnect.getServer() == null) {
                 throw new IllegalStateException("Il server non è stato inizializzato");
             }
-            writeState("RUNNING", "PlayStation e telefono devono essere sulla stessa rete Wi-Fi");
+            writeState("RUNNING", "Tieni sempre a PS5 e u telefn ncopp a stessa Wi-Fi osino i tarantell");
             updateNotification("Attivo sulla porta UDP 19132");
         } catch (Throwable error) {
             writeState("ERROR", "Avvio non riuscito: " + error.getClass().getSimpleName());
