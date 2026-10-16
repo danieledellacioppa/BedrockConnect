@@ -25,6 +25,7 @@ public class BedrockConnect {
     private static Database database;
     private static DataUtil data;
     private static Server server;
+    private static File workingDirectory = new File(".");
 
     public static Logger logger = LoggerFactory.getLogger(BedrockConnect.class);
 
@@ -49,7 +50,7 @@ public class BedrockConnect {
             }
 
             // Find any settings in configuration file
-            File configFile = new File("config.yml");
+            File configFile = resolveFile("config.yml");
             if(configFile.exists() && !configFile.isDirectory()) {
                 settingsFile = true;
                 try {
@@ -95,6 +96,33 @@ public class BedrockConnect {
 
     public static Server getServer() {
         return server;
+    }
+
+    /**
+     * Changes the directory used for runtime data such as config.yml and the
+     * players folder. Desktop launches keep using the current directory; an
+     * embedded host (for example Android) can point this at app-private data.
+     */
+    public static void setWorkingDirectory(File directory) {
+        if (directory == null) {
+            throw new IllegalArgumentException("Working directory cannot be null");
+        }
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new IllegalArgumentException("Unable to create working directory: " + directory);
+        }
+        workingDirectory = directory;
+    }
+
+    public static File resolveFile(String path) {
+        File file = new File(path);
+        return file.isAbsolute() ? file : new File(workingDirectory, path);
+    }
+
+    public static void stop() {
+        if (server != null) {
+            server.close();
+            server = null;
+        }
     }
 
     public static void loadDatasource(String hostname, String databaseName, String username, String password, DatabaseTypes databaseType, boolean autoReconnect, boolean usingDatabase) {

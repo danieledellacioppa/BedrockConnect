@@ -179,7 +179,7 @@ public class Config {
                             String selectedIP = reader.next().replaceAll("\\s+", "");
                             reader.close();
 
-                            BufferedWriter br = new BufferedWriter(new FileWriter(new File("bc_dns.conf")));
+                            BufferedWriter br = new BufferedWriter(new FileWriter(BedrockConnect.resolveFile("bc_dns.conf")));
                             br.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                                     "<DNSMasqConfig xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
                                     "  <DNSMasqEntries>\n" +
@@ -309,7 +309,7 @@ public class Config {
 
                 // If the file doesn't already exist, create a configuration file containing the hard-coded IPs
                 // for the featured servers if fetching the featured ips is set to disabled
-                File ipFile = new File("featured_server_ips.json");
+                File ipFile = BedrockConnect.resolveFile("featured_server_ips.json");
                 if (ipFile.createNewFile()) {
                     featuredServerIps.put("hivebedrock.network", "167.114.81.89");
                     featuredServerIps.put("mco.cubecraft.net", "51.178.75.10");
@@ -323,12 +323,12 @@ public class Config {
                         jo.put(server.getKey(), server.getValue());
                     }
 
-                    PrintWriter pw = new PrintWriter("featured_server_ips.json");
+                    PrintWriter pw = new PrintWriter(ipFile);
                     pw.write(jo.toJSONString());
                     pw.flush();
                     pw.close();
                 } else {
-                    Object obj = new JSONParser().parse(new FileReader("featured_server_ips.json"));
+                    Object obj = new JSONParser().parse(new FileReader(ipFile));
 
                     JSONObject jo = (JSONObject) obj;
                     for (Object server : jo.keySet()) {
@@ -351,7 +351,7 @@ public class Config {
     public void loadMotdMessage() {        
         if (motdFile != null) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(motdFile), "UTF-8"));
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(BedrockConnect.resolveFile(motdFile)), "UTF-8"));
                 String msg = "";
                 String line = "";
                 while ((line = in.readLine()) != null) {

@@ -1,0 +1,59 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.pugmatt.bedrockconnect.android"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.pugmatt.bedrockconnect.android"
+        minSdk 30
+        targetSdk 35
+        versionCode 1
+        versionName "0.1"
+    }
+
+    sourceSets {
+        main {
+            // Compile the existing server directly: there is only one protocol
+            // implementation to maintain for desktop and Android.
+            java.srcDirs += ["../../serverlist-server/src"]
+            resources.srcDirs += ["../../serverlist-server/src/main/resources"]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/DEPENDENCIES",
+                    "META-INF/INDEX.LIST",
+                    "META-INF/io.netty.versions.properties",
+                    "META-INF/LICENSE*",
+                    "META-INF/NOTICE*",
+                    "META-INF/versions/**",
+                    "module-info.class"
+            ]
+            merges += ["META-INF/services/**"]
+        }
+    }
+}
+
+dependencies {
+    implementation("org.cloudburstmc.protocol:bedrock-connection:3.0.0.Beta13-20260907.175719-23")
+    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.googlecode.json-simple:json-simple:1.1.1") {
+        exclude group: "junit", module: "junit"
+        exclude group: "org.hamcrest", module: "hamcrest-core"
+    }
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.25.5")
+    implementation("org.apache.logging.log4j:log4j-core:2.25.4")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.3")
+}

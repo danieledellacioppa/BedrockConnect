@@ -24,6 +24,8 @@ public class Server {
 
     private final NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
     private BedrockPong pong;
+    private Channel channel;
+    private Timer inactivityTimer;
 
     public static final ObjectMapper JSON_MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     public static final YAMLMapper YAML_MAPPER = (YAMLMapper) new YAMLMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -69,7 +71,7 @@ public class Server {
             pong.protocolVersion(BedrockProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion());
             pong.version(BedrockProtocol.DEFAULT_BEDROCK_CODEC.getMinecraftVersion());
 
-            new ServerBootstrap()
+            channel = new ServerBootstrap()
                 .group(this.eventLoopGroup)
                 .channelFactory(RakChannelFactory.server(NioDatagramChannel.class))
                 .option(RakChannelOption.RAK_ADVERTISEMENT, pong.toByteBuf())
@@ -97,11 +99,12 @@ public class Server {
                     }
                 })
                 .bind(bindAddress)
-                .syncUninterruptibly();
+                .syncUninterruptibly()
+                .channel();
 
             BedrockConnect.logger.info("[ " + LogColors.green("OK") + " ] Server is now running: " + LogColors.cyan(bindIp + ":" + port));
             if(BedrockConnect.getConfig().canKickInactive()) {
-                Timer timer = new Timer();
+                inactivityTimer = new Timer();
                 TimerTask task = new TimerTask() {
                     public void run() {
                         for (BCPlayer player : players) {
@@ -110,7 +113,7 @@ public class Server {
                         }
                     }
                 };
-                timer.scheduleAtFixedRate(task, 0L, 60 * 1000);
+                inactivityTimer.scheduleAtFixedRate(task, 0L, 60 * 1000);
             }
 
             // Command line input (Currently just for stopping BedrockConnect via command)
@@ -171,5 +174,18 @@ public class Server {
                 BedrockConnect.logger.error("Error starting server", e);
             }
         }
+    }
+
+    public void close() {
+        if (inactivityTimer != null) {
+            inactivityTimer.cancel();
+            inactivityTimer = null;
+        }
+        if (channel != null) {
+            channel.close().syncUninterruptibly();
+            channel = null;
+        }
+        eventLoopGroup.shutdownGracefully().syncUninterruptibly();
+        BedrockConnect.logger.info("Server stopped");
     }
 }

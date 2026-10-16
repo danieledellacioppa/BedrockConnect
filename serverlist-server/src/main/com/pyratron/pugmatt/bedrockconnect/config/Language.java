@@ -65,7 +65,7 @@ public class Language {
     }
 
     private JSONObject loadCustom(String file) throws IOException, ParseException {
-        return (JSONObject) new JSONParser().parse(new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF-8")));
+        return (JSONObject) new JSONParser().parse(new BufferedReader(new InputStreamReader(new FileInputStream(BedrockConnect.resolveFile(file)),"UTF-8")));
     }
 
     public String getWording(String rootKey, String key) {

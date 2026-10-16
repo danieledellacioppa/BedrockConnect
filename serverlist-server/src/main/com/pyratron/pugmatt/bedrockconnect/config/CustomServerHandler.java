@@ -26,7 +26,7 @@ public class CustomServerHandler {
 		}
 
 		JSONParser parser = new JSONParser();
-		try (Reader reader = new FileReader(serverFile)) {
+		try (Reader reader = new FileReader(BedrockConnect.resolveFile(serverFile))) {
 
 			JSONArray serverList = (JSONArray) parser.parse(reader);
 

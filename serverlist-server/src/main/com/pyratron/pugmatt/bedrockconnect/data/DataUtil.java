@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +100,8 @@ public class DataUtil {
             if (viewedMotdExists) {
                 Timestamp ts = rs.getTimestamp("viewedMotd");
                 if (ts != null)
-                    viewedMotd = ts.toLocalDateTime();
+                    viewedMotd = LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(ts.getTime()), ZoneId.systemDefault());
             } 
 
             BCPlayer p = new BCPlayer(name, uuid, session, UIComponents.getFormData(rs.getString("servers")),
@@ -162,9 +165,9 @@ public class DataUtil {
             }).start();
         } else {
             try {
-                File f = new File("players");
+                File f = BedrockConnect.resolveFile("players");
                 f.mkdir();
-                File plyrFile = new File("players/" + uuid + ".json");
+                File plyrFile = BedrockConnect.resolveFile("players/" + uuid + ".json");
                 if (plyrFile.createNewFile()) {
                     JSONObject jo = new JSONObject();
                     jo.put("uuid", uuid);
@@ -174,7 +177,7 @@ public class DataUtil {
                     jo.put("serverLimit", BedrockConnect.getConfig().getServerLimit());
                     jo.put("servers", new JSONArray());
 
-                    PrintWriter pw = new PrintWriter("players/" + uuid + ".json");
+                    PrintWriter pw = new PrintWriter(plyrFile);
                     pw.write(jo.toJSONString());
                     pw.flush();
                     pw.close();
@@ -185,7 +188,7 @@ public class DataUtil {
                     packetHandler.setPlayer(pl);
                     BedrockConnect.getServer().addPlayer(pl);
                 } else {
-                    Object obj = new JSONParser().parse(new FileReader("players/" + uuid + ".json"));
+                    Object obj = new JSONParser().parse(new FileReader(plyrFile));
 
                     JSONObject jo = (JSONObject) obj;
 
@@ -224,13 +227,14 @@ public class DataUtil {
             }).start();
         } else {
             try {
-                Object obj = new JSONParser().parse(new FileReader("players/" + uuid + ".json"));
+                File playerFile = BedrockConnect.resolveFile("players/" + uuid + ".json");
+                Object obj = new JSONParser().parse(new FileReader(playerFile));
 
                 JSONObject jo = (JSONObject) obj;
 
                 jo.put("servers", serverList);
 
-                PrintWriter pw = new PrintWriter("players/" + uuid + ".json");
+                PrintWriter pw = new PrintWriter(playerFile);
                 pw.write(jo.toJSONString());
                 pw.flush();
                 pw.close();
@@ -263,7 +267,8 @@ public class DataUtil {
                     try {
                     PreparedStatement s = database.getConnection()
                             .prepareStatement("UPDATE servers SET viewedMotd = ? WHERE uuid= ?");
-                        s.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+                        s.setTimestamp(1, new Timestamp(LocalDateTime.now()
+                                .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
                         s.setString(2, uuid);
 
                         s.executeUpdate();
@@ -274,13 +279,14 @@ public class DataUtil {
             }
         } else {
             try {
-                Object obj = new JSONParser().parse(new FileReader("players/" + uuid + ".json"));
+                File playerFile = BedrockConnect.resolveFile("players/" + uuid + ".json");
+                Object obj = new JSONParser().parse(new FileReader(playerFile));
 
                 JSONObject jo = (JSONObject) obj;
 
                 jo.put("viewedMotd", LocalDateTime.now().toString());
 
-                PrintWriter pw = new PrintWriter("players/" + uuid + ".json");
+                PrintWriter pw = new PrintWriter(playerFile);
                 pw.write(jo.toJSONString());
                 pw.flush();
                 pw.close();

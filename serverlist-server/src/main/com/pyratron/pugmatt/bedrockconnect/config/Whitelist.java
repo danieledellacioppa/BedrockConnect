@@ -16,7 +16,7 @@ public class Whitelist {
 		if (whitelistFile == null) return;
 		
 		try {
-			File file = new File(whitelistFile);
+			File file = BedrockConnect.resolveFile(whitelistFile);
 			whitelist =  Files.readAllLines(file.toPath());
 			BedrockConnect.logger.debug("Whitelist data: " + whitelist.toString());
 		} catch (Exception e) {
