@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BedrockConnect LAN</string>
+    <string name="app_kicker">CONSOLE BRIDGE</string>
+    <string name="app_subtitle">La scorciatoia per i server Bedrock</string>
+    <string name="status_idle">Server fermo</string>
+    <string name="status_starting">Avvio in corso</string>
+    <string name="status_active">Server attivo</string>
+    <string name="status_stopping">Arresto in corso</string>
+    <string name="status_error">Qualcosa non ha funzionato</string>
+    <string name="ready_detail">Pronto su %1$s</string>
+    <string name="starting_detail">Apertura di %1$s:19132…</string>
+    <string name="stopping_detail">Chiusura del bridge…</string>
+    <string name="listen_label">INDIRIZZO LAN</string>
+    <string name="listen_address">%1$s:19132</string>
+    <string name="copy">Copia</string>
+    <string name="clipboard_label">Indirizzo BedrockConnect</string>
+    <string name="address_copied">Indirizzo copiato</string>
+    <string name="ip_unavailable">IP non disponibile</string>
+    <string name="ip_unavailable_hint">Connetti il telefono al Wi-Fi</string>
+    <string name="destination_label">DESTINAZIONE PREDEFINITA</string>
+    <string name="destination_name">DIOCALANDIA</string>
+    <string name="destination_address">85.14.210.14:21200</string>
+    <string name="start_server">Avvia server</string>
+    <string name="stop_server">Ferma</string>
+    <string name="playstation_steps"><b>Su PlayStation:</b> apri Minecraft, vai in Gioca → Mondi e seleziona BedrockConnect.</string>
+    <string name="live_log">LOG IN TEMPO REALE</string>
+    <string name="log_hint">Si aggiorna solo quando arrivano nuovi eventi</string>
+    <string name="no_logs">I log appariranno qui dopo l’avvio.</string>
+    <string name="log_read_error">Errore lettura log: %1$s</string>
+    <string name="notification_channel">Server BedrockConnect</string>
+    <string name="notification_title">BedrockConnect LAN</string>
+    <string name="notification_stop">Ferma</string>
+    <string name="app_icon_description">Icona BedrockConnect</string>
+</resources>

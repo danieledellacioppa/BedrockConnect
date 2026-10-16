@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Process;
+import android.util.AtomicFile;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,10 +25,12 @@ import main.com.pyratron.pugmatt.bedrockconnect.BedrockConnect;
 public final class BedrockServerService extends Service {
     public static final String ACTION_START = "bedrock.start";
     public static final String ACTION_STOP = "bedrock.stop";
+    public static final String STATE_FILE = "server_state.json";
     private static final String CHANNEL = "bedrock_server";
     private static final int NOTIFICATION_ID = 19132;
 
     private volatile boolean started;
+    private volatile String lastState = "STOPPED";
     private WifiManager.MulticastLock multicastLock;
     private PowerManager.WakeLock wakeLock;
 
@@ -47,6 +50,8 @@ public final class BedrockServerService extends Service {
         if (started) return START_NOT_STICKY;
         started = true;
 
+        writeState("STARTING", "Preparazione del bridge sulla porta UDP 19132…");
+        updateNotification("Server in preparazione…");
         acquireNetworkLocks();
         new Thread(this::runServer, "BedrockConnect-main").start();
         return START_NOT_STICKY;
@@ -73,14 +78,22 @@ public final class BedrockServerService extends Service {
             System.setProperty("logDirectory", logs.getAbsolutePath());
             System.setProperty("log4j2.disableJmx", "true");
             BedrockConnect.setWorkingDirectory(data);
-            updateNotification("Attivo sulla porta UDP 19132");
             BedrockConnect.main(new String[]{
                     "debug=true",
                     "custom_servers=" + customServers.getAbsolutePath()
             });
+            if (BedrockConnect.getServer() == null) {
+                throw new IllegalStateException("Il server non è stato inizializzato");
+            }
+            writeState("RUNNING", "PlayStation e telefono devono essere sulla stessa rete Wi-Fi");
+            updateNotification("Attivo sulla porta UDP 19132");
         } catch (Throwable error) {
+            writeState("ERROR", "Avvio non riuscito: " + error.getClass().getSimpleName());
             updateNotification("Errore: " + error.getClass().getSimpleName());
             android.util.Log.e("BedrockConnect", "Server failed", error);
+            releaseLocks();
+            stopForeground(STOP_FOREGROUND_REMOVE);
+            stopSelf();
         }
     }
 
@@ -99,11 +112,14 @@ public final class BedrockServerService extends Service {
     }
 
     private void shutdown() {
+        writeState("STOPPING", "Arresto del bridge in corso…");
+        updateNotification("Arresto in corso…");
         new Thread(() -> {
             try {
                 BedrockConnect.stop();
             } catch (Throwable ignored) {
             }
+            writeState("STOPPED", "Pronto per essere avviato");
             releaseLocks();
             stopForeground(STOP_FOREGROUND_REMOVE);
             stopSelf();
@@ -119,6 +135,9 @@ public final class BedrockServerService extends Service {
     @Override
     public void onDestroy() {
         releaseLocks();
+        if (!"ERROR".equals(lastState) && !"STOPPED".equals(lastState)) {
+            writeState("STOPPED", "Il servizio è stato arrestato");
+        }
         super.onDestroy();
     }
 
@@ -129,7 +148,7 @@ public final class BedrockServerService extends Service {
 
     private void createChannel() {
         NotificationChannel channel = new NotificationChannel(
-                CHANNEL, "BedrockConnect server", NotificationManager.IMPORTANCE_LOW);
+                CHANNEL, getString(R.string.notification_channel), NotificationManager.IMPORTANCE_LOW);
         getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
@@ -141,16 +160,36 @@ public final class BedrockServerService extends Service {
         PendingIntent stop = PendingIntent.getService(this, 1, stopIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new Notification.Builder(this, CHANNEL)
-                .setSmallIcon(android.R.drawable.stat_sys_upload_done)
-                .setContentTitle("BedrockConnect LAN")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setColor(getColor(R.color.primary))
+                .setContentTitle(getString(R.string.notification_title))
                 .setContentText(text)
                 .setContentIntent(open)
                 .setOngoing(true)
-                .addAction(new Notification.Action.Builder(null, "Ferma", stop).build())
+                .addAction(new Notification.Action.Builder(
+                        null, getString(R.string.notification_stop), stop).build())
                 .build();
     }
 
     private void updateNotification(String text) {
         getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notification(text));
+    }
+
+    private void writeState(String state, String detail) {
+        lastState = state;
+        AtomicFile file = new AtomicFile(new File(getFilesDir(), STATE_FILE));
+        FileOutputStream output = null;
+        try {
+            JSONObject value = new JSONObject();
+            value.put("state", state);
+            value.put("detail", detail);
+            value.put("updatedAt", System.currentTimeMillis());
+            output = file.startWrite();
+            output.write(value.toString().getBytes(StandardCharsets.UTF_8));
+            file.finishWrite(output);
+        } catch (Exception error) {
+            if (output != null) file.failWrite(output);
+            android.util.Log.w("BedrockConnect", "Unable to persist server state", error);
+        }
     }
 }
