@@ -53,7 +53,7 @@ public final class BedrockServerService extends Service {
         writeState("STARTING", "Preparazione del bridge sulla porta UDP 19132…");
         updateNotification("Server in preparazione…");
         acquireNetworkLocks();
-        new Thread(this::runServer, "BedrockConnect-main").start();
+        new Thread(this::runServer, "SonyMERDA-main").start();
         return START_NOT_STICKY;
     }
 
@@ -101,7 +101,7 @@ public final class BedrockServerService extends Service {
         } catch (Throwable error) {
             writeState("ERROR", "Avvio non riuscito: " + error.getClass().getSimpleName());
             updateNotification("Errore: " + error.getClass().getSimpleName());
-            android.util.Log.e("BedrockConnect", "Server failed", error);
+            android.util.Log.e("SonyMERDA", "Server failed", error);
             releaseLocks();
             stopForeground(STOP_FOREGROUND_REMOVE);
             stopSelf();

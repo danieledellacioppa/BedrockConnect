@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BedrockConnect LAN</string>
+    <string name="app_name">SonyMERDA</string>
     <string name="app_kicker">CONSOLE BRIDGE</string>
     <string name="app_subtitle">Un sistema complicatissimo per fare cose semplicissime</string>
     <string name="status_idle">Server fermo</string>
@@ -23,10 +23,10 @@
     <string name="destination_address">85.14.210.14:21200</string>
     <string name="start_server">Avvia server</string>
     <string name="stop_server">Ferma</string>
-    <string name="playstation_steps"><b>Sulla PS5 mo:</b> fai parti Minecraft, poi metti Gioca → Mondi e dovrebbe starci BedrockConnect.</string>
+    <string name="playstation_steps"><b>Innanzitutto clicca su Avvia Server, poi sulla PS5:</b> fai parti Minecraft, poi metti Gioca → Mondi e dovrebbe starci SonyMERDA. E lo sai perchè? Perchè Sony è una MERDA. Ecco spiegato</string>
     <string name="live_log">LOG IN TEMPO REALE</string>
     <string name="log_hint">Si aggiorna solo quando arrivano nuovi eventi</string>
-    <string name="no_logs">I log appariranno qui dopo l’avvio.</string>
+    <string name="no_logs">I log escono qua dentro appena succedono cose incluso interazioni varie tra PS5 e telefono</string>
     <string name="log_read_error">Errore lettura log: %1$s</string>
     <string name="notification_channel">Server BedrockConnect</string>
     <string name="notification_title">BedrockConnect LAN</string>
